@@ -7,7 +7,7 @@ import (
 	"golang.org/x/crypto/curve25519"
 )
 
-func Encrypt(plainText, publicKey []byte) ([]byte, error) {
+func Encrypt(plainText []byte, publicKey [32]byte) ([]byte, error) {
 	var r, R, S, K_B [32]byte
 
 	if _, err := rand.Read(r[:]); err != nil {
@@ -17,7 +17,8 @@ func Encrypt(plainText, publicKey []byte) ([]byte, error) {
 	r[31] &= 127
 	r[31] |= 64
 
-	copy(K_B[:], publicKey)
+	// copy(K_B, publicKey)
+	K_B = publicKey
 
 	curve25519.ScalarBaseMult(&R, &r)
 	curve25519.ScalarMult(&S, &r, &K_B)
@@ -32,10 +33,11 @@ func Encrypt(plainText, publicKey []byte) ([]byte, error) {
 	return cipherText, nil
 }
 
-func Decrypt(cipherText, privateKey []byte) ([]byte, error) {
+func Decrypt(cipherText []byte, privateKey [32]byte) ([]byte, error) {
 	var R, S, k_B [32]byte
 	copy(R[:], cipherText[:32])
-	copy(k_B[:], privateKey)
+	// copy(k_B[:], privateKey)
+	k_B = privateKey
 
 	curve25519.ScalarMult(&S, &k_B, &R)
 
