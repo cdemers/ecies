@@ -3,10 +3,29 @@ package ecies
 import (
 	"crypto/rand"
 	"crypto/sha512"
+	"fmt"
 
 	"golang.org/x/crypto/curve25519"
 )
 
+// GenerateKeys generates and returns two 32 bytes ECC keys
+func GenerateKeys() (encKey, decKey [32]byte, err error) {
+
+	if _, err := rand.Read(decKey[:]); err != nil {
+		err = fmt.Errorf("could not generate decKey: %v", err)
+		return encKey, decKey, err
+	}
+
+	decKey[0] &= 248
+	decKey[31] &= 127
+	decKey[31] |= 64
+
+	curve25519.ScalarBaseMult(&encKey, &decKey)
+
+	return encKey, decKey, nil
+}
+
+// Encrypt returns a Curve25519 encrypted byte array
 func Encrypt(plainText []byte, publicKey [32]byte) ([]byte, error) {
 	var r, R, S, K_B [32]byte
 
@@ -33,6 +52,7 @@ func Encrypt(plainText []byte, publicKey [32]byte) ([]byte, error) {
 	return cipherText, nil
 }
 
+// Decrypt returns a Curve25519 decrypted byte array
 func Decrypt(cipherText []byte, privateKey [32]byte) ([]byte, error) {
 	var R, S, k_B [32]byte
 	copy(R[:], cipherText[:32])
