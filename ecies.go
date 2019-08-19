@@ -45,6 +45,9 @@ func Encrypt(plainText []byte, publicKey [32]byte) ([]byte, error) {
 
 	cipherText := make([]byte, 32+len(plainText))
 	copy(cipherText[:32], R[:])
+	fmt.Printf("plainText Len: %d\n", len(plainText))
+	fmt.Printf("cipherText Len: %d\n", len(cipherText))
+	fmt.Printf("k_E Len: %d\n", len(k_E))
 	for i := 0; i < len(plainText); i++ {
 		cipherText[32+i] = plainText[i] ^ k_E[i]
 	}

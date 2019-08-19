@@ -3,7 +3,9 @@ package ecies
 import (
 	"bytes"
 	"crypto/rand"
+	"encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"golang.org/x/crypto/curve25519"
@@ -28,6 +30,8 @@ func TestEncrypt(t *testing.T) {
 	if err != nil {
 		t.Fatalf("got error: %v", err)
 	}
+
+	fmt.Printf("Cypher Text: %v\n", base64.StdEncoding.EncodeToString(cipherText))
 
 	plainText2, err := Decrypt(cipherText, privKey)
 	if err != nil {
